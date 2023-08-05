@@ -1,0 +1,11 @@
+.DS_Store
+
+/workdir/projects/typecho
+/workdir/projects/wordpress
+/workdir/logs/
+/workdir/ssl/
+/workdir/mysql/
+
+/conf/nginx/sites-enabled
+
+docker-compose.yml

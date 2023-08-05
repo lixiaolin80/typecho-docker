@@ -1,0 +1,51 @@
+version: '3'
+# https://github.com/nanoninja/docker-nginx-php-mysql/blob/master/docker-compose.yml
+networks:
+  myblog_docker:
+
+services:
+
+  nginx:
+    container_name: myblog_nginx
+    image: nginx:1.18
+    restart: unless-stopped
+    volumes:
+      - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./conf/nginx/sites-enabled:/etc/nginx/conf.d/
+      - ./workdir:/workdir
+    networks:
+      - myblog_docker
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - php
+
+  php:
+    container_name: myblog_php
+    build: ./build/php
+    restart: unless-stopped
+    volumes:
+      - ./conf/php/php-fpm.conf:/usr/local/etc/php-fpm.conf
+      - ./workdir/logs/php:/opt/log/php
+      - ./workdir:/workdir
+    networks:
+      - myblog_docker
+    depends_on:
+      - mysql
+    environment:
+      - TZ=Asia/Shanghai
+
+  mysql:
+    container_name: myblog_mysql
+    # build: ./build/mysql
+    image: mysql:5.7
+    restart: unless-stopped
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+    volumes:
+      - ./workdir/mysql/data/:/var/lib/mysql/
+    environment:
+      - MYSQL_ROOT_PASSWORD=MYSQL_ROOT_PASSWORD_REPLACE
+    networks:
+      - myblog_docker
+
